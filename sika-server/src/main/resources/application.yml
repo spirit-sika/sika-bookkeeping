@@ -1,0 +1,79 @@
+server:
+  port: ${sika.port}
+
+spring:
+  application:
+    name: sika-bookkeeping
+  datasource:
+    ############## 数据源, druid配置示例: https://github.com/alibaba/druid/wiki/DruidDataSource%E9%85%8D%E7%BD%AE ##############
+    driver-class-name: ${sika.database.driver-class-name}
+    url: ${sika.database.url}
+    username: ${sika.database.username}
+    password: ${sika.database.password}
+    type: ${sika.database.type}
+    druid:
+      test-on-borrow: ${sika.database.druid.test-on-borrow}
+      test-while-idle: ${sika.database.druid.test-while-idle}
+      validation-query: ${sika.database.druid.validation-query}
+      time-between-eviction-runs-millis: ${sika.database.druid.time-between-eviction-runs-millis}
+
+  ############## redis ##############
+  data:
+    redis:
+      database: ${sika.data.redis.database}
+      host: ${sika.data.redis.host}
+      port: ${sika.data.redis.port}
+      password: ${sika.data.redis.password}
+      timeout: ${sika.data.redis.timeout}
+      lettuce:
+        pool:
+          max-active: ${sika.data.redis.lettuce.pool.max-active}
+          max-wait: ${sika.data.redis.lettuce.pool.max-wait}
+          max-idle: ${sika.data.redis.lettuce.pool.max-idle}
+          min-idle: ${sika.data.redis.lettuce.pool.min-idle}
+  profiles:
+    active: dev
+
+############## 接口文档 配置 (文档:https://doc.xiaominfo.com/) ##############
+springdoc:
+  swagger-ui:
+    path: ${sika.springdoc.swagger-ui.path}
+    tags-sorter: ${sika.springdoc.swagger-ui.tags-sorter}
+    operations-sorter: ${sika.springdoc.swagger-ui.operations-sorter}
+  api-docs:
+    enabled: ${sika.springdoc.api-docs.enabled}
+    path: ${sika.springdoc.api-docs.path}
+  group-configs:
+    - group: ${sika.springdoc.group-configs[0].group}
+      paths-to-match: ${sika.springdoc.group-configs[0].paths-to-match}
+      packages-to-scan: ${sika.springdoc.group-configs[0].packages-to-scan}
+knife4j:
+  enable: ${sika.knife4j.enable}
+  setting:
+    language: ${sika.knife4j.setting.language}
+
+############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
+sa-token:
+  token-name: ${sika.sa-token.token-name}
+  timeout: ${sika.sa-token.timeout}
+  active-timeout: ${sika.sa-token.active-timeout}
+  is-concurrent: ${sika.sa-token.is-concurrent}
+  is-share: ${sika.sa-token.is-share}
+  token-style: ${sika.sa-token.token-style}
+  token-prefix: ${sika.sa-token.token-prefix}
+  is-log: ${sika.sa-token.is-log}
+
+############## My-Batis 配置 (文档: https://baomidou.com/) ##############
+mybatis-plus:
+  type-aliases-package: ${sika.mybatis-plus.type-aliases-package}
+
+############## 日志级别 ##############
+logging:
+  level:
+    cc:
+      sika:
+        sikaloginserver:
+          mapper: ${sika.logging.level.cc.sika.sikaloginserver.mapper}
+    root: ${sika.logging.level.root}
+    org:
+      springframework: ${sika.logging.level.org.springframework}
