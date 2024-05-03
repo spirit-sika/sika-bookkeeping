@@ -1,11 +1,12 @@
 package cc.sika.bookkeeping.controller;
 
 import cc.sika.bookkeeping.pojo.dto.LoginDTO;
-import cc.sika.bookkeeping.service.CaptchaService;
-import cc.sika.bookkeeping.service.LoginService;
+import cc.sika.bookkeeping.pojo.dto.RegisterDTO;
 import cc.sika.bookkeeping.pojo.vo.CaptchaVO;
 import cc.sika.bookkeeping.pojo.vo.LoginVO;
 import cc.sika.bookkeeping.pojo.vo.Result;
+import cc.sika.bookkeeping.service.CaptchaService;
+import cc.sika.bookkeeping.service.LoginService;
 import cn.dev33.satoken.annotation.SaIgnore;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,5 +40,13 @@ public class LoginController {
     public Result<CaptchaVO> getCaptcha() {
         CaptchaVO captchaVO = captchaService.generateCaptcha();
         return Result.success(captchaVO);
+    }
+
+    @Operation(summary = "用户注册接口")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)))
+    @PostMapping("register")
+    @SaIgnore
+    public Result<String> register(@RequestBody RegisterDTO registerDTO) {
+        return Result.success(loginService.register(registerDTO));
     }
 }

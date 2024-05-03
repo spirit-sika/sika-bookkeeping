@@ -1,6 +1,7 @@
 package cc.sika.bookkeeping.service;
 
 import cc.sika.bookkeeping.pojo.dto.LoginDTO;
+import cc.sika.bookkeeping.pojo.dto.RegisterDTO;
 import cc.sika.bookkeeping.pojo.vo.LoginVO;
 
 public interface LoginService {
@@ -13,4 +14,6 @@ public interface LoginService {
     String login(LoginDTO loginDTO);
 
     LoginVO loginAndGetVO(LoginDTO loginDTO);
+
+    String register(RegisterDTO registerDTO);
 }

@@ -2,9 +2,13 @@ package cc.sika.bookkeeping.service.impl;
 
 import cc.sika.bookkeeping.constant.AuthenticationConstant;
 import cc.sika.bookkeeping.exception.LoginException;
+import cc.sika.bookkeeping.exception.RegisterException;
 import cc.sika.bookkeeping.mapper.SikaUserMapper;
+import cc.sika.bookkeeping.mapper.SikaUserRoleMapper;
 import cc.sika.bookkeeping.pojo.dto.LoginDTO;
+import cc.sika.bookkeeping.pojo.dto.RegisterDTO;
 import cc.sika.bookkeeping.pojo.po.SikaUser;
+import cc.sika.bookkeeping.pojo.po.SikaUserRole;
 import cc.sika.bookkeeping.pojo.vo.LoginVO;
 import cc.sika.bookkeeping.service.CaptchaService;
 import cc.sika.bookkeeping.service.LoginService;
@@ -16,6 +20,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Objects;
@@ -26,6 +31,7 @@ public class DefaultLoginServiceImpl implements LoginService {
 
     private final CaptchaService captchaService;
     private final SikaUserService userService;
+    private final SikaUserRoleMapper sikaUserRoleMapper;
     private final SikaUserMapper sikaUserMapper;
 
     @Override
@@ -49,6 +55,61 @@ public class DefaultLoginServiceImpl implements LoginService {
         LoginVO loginVO = BeanUtil.copyProperties(user, LoginVO.class);
         loginVO.setToken(StpUtil.getTokenValue());
         return loginVO;
+    }
+
+    @Override
+    @Transactional(rollbackFor = RegisterException.class)
+    public String register(RegisterDTO registerDTO) {
+        LambdaQueryWrapper<SikaUser> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        /* 检查是否存在相同手机号码 */
+        SikaUser isUserExists = sikaUserMapper.selectOne(
+                userLambdaQueryWrapper.eq(SikaUser::getPhone, registerDTO.getPhone()),
+                false);
+        if (!Objects.isNull(isUserExists)) {
+            throw new RegisterException("手机号码已被注册!");
+        }
+        /* 构建用户实体 */
+        SikaUser sikaUser = SikaUser.builder()
+                .phone(registerDTO.getPhone())
+                .username(registerDTO.getPhone())
+                .nickname(registerDTO.getNickname()).build();
+        // 性别处理
+        Byte sex = registerDTO.getSex();
+        if (!Objects.isNull(sex) && (1 == sex.intValue() || 2 == sex.intValue())) {
+            sikaUser.setSex(sex);
+        }
+        else {
+            sikaUser.setSex(Byte.valueOf("0"));
+        }
+        String email = registerDTO.getEmail();
+        // 邮箱格式校验由接口参数校验完成, 接口参数校验可以为null
+        if (StringUtils.hasText(email)) {
+            sikaUser.setEmail(email);
+        }
+        // 密码, 未填写时默认为手机号码
+        String userPassword = registerDTO.getPassword();
+        if (StringUtils.hasText(userPassword)) {
+            sikaUser.setPassword(SaSecureUtil.sha256(userPassword));
+        }
+        else {
+            sikaUser.setPassword(SaSecureUtil.sha256(registerDTO.getPhone()));
+        }
+
+        /* 插入用户数据 */
+        int insertResult = sikaUserMapper.insertUser(sikaUser);
+        if (insertResult != 1) {
+            throw new RegisterException("注册用户失败, 请联系管理人员!");
+        }
+        /* 生成角色信息 */
+        SikaUserRole userRoleMapEntity = SikaUserRole.builder()
+                .userId(sikaUser.getUserId())
+                .roleId(AuthenticationConstant.USER_ROLE_ID)
+                .build();
+        int mapUserRoleResult = sikaUserRoleMapper.insert(userRoleMapEntity);
+        if (mapUserRoleResult != 1) {
+            throw new RegisterException("绑定用户角色失败, 请联系管理人员!");
+        }
+        return sikaUser.getNickname() + "用户注册成功";
     }
 
     /**

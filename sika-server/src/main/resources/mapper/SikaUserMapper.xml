@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cc.sika.bookkeeping.mapper.SikaUserMapper">
+    <insert id="insertUser"
+            useGeneratedKeys="true"
+            keyProperty="userId"
+            keyColumn="user_id"
+    >
+        INSERT INTO `sika_user`
+            (username, password, phone, email, sex, avatar, nickname,
+             create_time, create_by, update_time, update_by, remark)
+        VALUES
+            (#{username}, #{password}, #{phone}, #{email}, #{sex}, #{avatar}, #{nickname},
+             #{createTime}, #{createBy}, #{updateTime}, #{updateBy}, #{remark})
+    </insert>
+</mapper>

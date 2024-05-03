@@ -66,6 +66,9 @@ sa-token:
 ############## My-Batis 配置 (文档: https://baomidou.com/) ##############
 mybatis-plus:
   type-aliases-package: ${sika.mybatis-plus.type-aliases-package}
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
 
 ############## 日志级别 ##############
 logging:

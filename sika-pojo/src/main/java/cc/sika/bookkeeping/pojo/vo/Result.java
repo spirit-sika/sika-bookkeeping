@@ -36,9 +36,9 @@ public class Result<T> implements Serializable {
 
     public static <T> Result<T> error(T data) {
         if (data instanceof String) {
-            return error(200, (String) data, null);
+            return error(500, (String) data, null);
         }
-        return error(200, "error", data);
+        return error(500, "error", data);
     }
 
     public static <T> Result<T> error(Integer code, T data) {

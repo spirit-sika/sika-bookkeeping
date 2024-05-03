@@ -76,6 +76,20 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
+        <!--aop-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <!--本地模块-->
+        <dependency>
+            <groupId>cc.sika</groupId>
+            <artifactId>sika-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cc.sika</groupId>
+            <artifactId>sika-pojo</artifactId>
+        </dependency>
         <!--test-->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -91,15 +105,6 @@
             <groupId>org.springframework.amqp</groupId>
             <artifactId>spring-rabbit-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <!--本地模块-->
-        <dependency>
-            <groupId>cc.sika</groupId>
-            <artifactId>sika-commons</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cc.sika</groupId>
-            <artifactId>sika-pojo</artifactId>
         </dependency>
     </dependencies>
 
