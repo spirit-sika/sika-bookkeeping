@@ -12,7 +12,6 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +20,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Service("sikaLedgerService")
-@RequiredArgsConstructor
 public class DefaultSikaLedgerServiceImpl extends ServiceImpl<SikaLedgerMapper, SikaLedger> implements SikaLedgerService {
 
     @Override
@@ -93,6 +91,4 @@ public class DefaultSikaLedgerServiceImpl extends ServiceImpl<SikaLedgerMapper, 
         }
 
     }
-
-    private final SikaLedgerMapper sikaLedgerMapper;
 }
