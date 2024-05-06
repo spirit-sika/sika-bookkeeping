@@ -51,6 +51,7 @@ knife4j:
   enable: ${sika.knife4j.enable}
   setting:
     language: ${sika.knife4j.setting.language}
+  production: false
 
 ############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
 sa-token:
@@ -69,6 +70,7 @@ mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
   configuration:
     map-underscore-to-camel-case: true
+    log-impl: ${sika.mybatis-plus.configuration.log-impl}
 
 ############## 日志级别 ##############
 logging:
