@@ -4,6 +4,7 @@ import cc.sika.bookkeeping.exception.CaptchaException;
 import cc.sika.bookkeeping.exception.LoginException;
 import cc.sika.bookkeeping.exception.RegisterException;
 import cc.sika.bookkeeping.pojo.vo.Result;
+import cn.dev33.satoken.exception.NotLoginException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -42,8 +43,14 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ExceptionHandler(Exception.class)
-    public Result<String> exception(Exception e) {
-        return Result.error("接口请求错误!");
+//    @ExceptionHandler(Exception.class)
+//    public Result<String> exception(Exception e) {
+//        return Result.error("接口请求错误!");
+//    }
+
+    @ExceptionHandler(NotLoginException.class)
+    public Result<String> notLoginException(NotLoginException e) {
+        return Result.error("账号未登录或登录信息已过期");
+//        return Result.error(e.getMessage());
     }
 }
