@@ -7,7 +7,9 @@ import cc.sika.bookkeeping.pojo.vo.LoginVO;
 import cc.sika.bookkeeping.pojo.vo.Result;
 import cc.sika.bookkeeping.service.CaptchaService;
 import cc.sika.bookkeeping.service.LoginService;
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaIgnore;
+import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -48,5 +50,14 @@ public class LoginController {
     @SaIgnore
     public Result<String> register(@RequestBody RegisterDTO registerDTO) {
         return Result.success(loginService.register(registerDTO));
+    }
+
+    @Operation(summary = "退出登录接口")
+    @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)))
+    @PostMapping("logout")
+    @SaCheckLogin
+    public Result<String> logout() {
+        StpUtil.logout();
+        return Result.success("退出登录成功!");
     }
 }
