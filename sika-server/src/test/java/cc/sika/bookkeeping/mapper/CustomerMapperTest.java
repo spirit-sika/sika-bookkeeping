@@ -1,5 +1,8 @@
 package cc.sika.bookkeeping.mapper;
 
+import cc.sika.bookkeeping.constant.AutoFillConstant;
+import cc.sika.bookkeeping.constant.LedgerConstant;
+import cc.sika.bookkeeping.pojo.po.SikaLedger;
 import cc.sika.bookkeeping.pojo.po.SikaUser;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import jakarta.annotation.Resource;
@@ -10,6 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class CustomerMapperTest {
     @Resource
     private SikaUserMapper sikaUserMapper;
+    @Resource
+    private SikaLedgerMapper sikaLedgerMapper;
 
     @Test
     void testInsertUser() {
@@ -22,5 +27,15 @@ public class CustomerMapperTest {
                 .avatar("")
                 .build();
         sikaUserMapper.insertUser(testUser);
+    }
+
+    @Test
+    void testInsertLedger() {
+        SikaLedger ledger = SikaLedger.builder()
+                .ledgerName(LedgerConstant.DEFAULT_LEDGER_NAME)
+                .ledgerStatus(AutoFillConstant.ENABLE_STATUS)
+                .build();
+        sikaLedgerMapper.insertLeger(ledger);
+        System.out.println("ledger's id = " + ledger.getLedgerId());
     }
 }
