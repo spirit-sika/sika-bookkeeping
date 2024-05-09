@@ -2,9 +2,11 @@ package cc.sika.bookkeeping.service;
 
 import cc.sika.bookkeeping.pojo.dto.LoginDTO;
 import cc.sika.bookkeeping.pojo.dto.RegisterDTO;
+import cc.sika.bookkeeping.pojo.po.SikaUser;
 import cc.sika.bookkeeping.pojo.vo.LoginVO;
+import com.baomidou.mybatisplus.extension.service.IService;
 
-public interface LoginService {
+public interface LoginService extends IService<SikaUser> {
 
     /**
      * 用户登录方法
