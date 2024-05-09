@@ -1,5 +1,6 @@
 package cc.sika.bookkeeping.pojo.po;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
@@ -18,7 +19,7 @@ public class SikaLedger implements Serializable {
     /**
      * 账本id
      */
-    @TableId
+    @TableId(type = IdType.AUTO)
     private Long ledgerId;
 
     /**

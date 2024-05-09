@@ -1,13 +1,12 @@
 package cc.sika.bookkeeping.service.impl;
 
-import cc.sika.bookkeeping.constant.PublicFieldNameConstant;
+import cc.sika.bookkeeping.constant.PublicFieldConstant;
 import cc.sika.bookkeeping.mapper.SikaLedgerMapper;
 import cc.sika.bookkeeping.pojo.dto.BaseQuery;
 import cc.sika.bookkeeping.pojo.dto.StatusBaseQuery;
 import cc.sika.bookkeeping.pojo.po.SikaLedger;
 import cc.sika.bookkeeping.pojo.vo.PageVO;
 import cc.sika.bookkeeping.service.SikaLedgerService;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -15,7 +14,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,20 +24,20 @@ public class DefaultSikaLedgerServiceImpl extends ServiceImpl<SikaLedgerMapper, 
     @Cacheable(cacheNames = "ledgerCache", key = "#statusQuery.toString()")
     public PageVO<SikaLedger> getLedgersPage(StatusBaseQuery statusQuery) {
         // 1. 构造查询条件
-        checkQuery(statusQuery);
+        fillQuery(statusQuery);
         Byte status = statusQuery.getStatus();
         Page<SikaLedger> page = Page.of(statusQuery.getPageNum(), statusQuery.getPageSize());
         // 按照指定的字段排序
         if (StrUtil.isNotBlank(statusQuery.getOrderBy())) {
             OrderItem orderItem = new OrderItem();
             orderItem.setColumn(statusQuery.getOrderBy())
-                            .setAsc(!statusQuery.getIsDesc());
+                     .setAsc(!statusQuery.getIsDesc());
             page.addOrder(orderItem);
         }
         // 按照更新时间排序
         else {
             OrderItem orderItem = new OrderItem();
-            orderItem.setColumn(PublicFieldNameConstant.UPDATE_BY)
+            orderItem.setColumn(PublicFieldConstant.UPDATE_BY)
                     .setAsc(!statusQuery.getIsDesc());
             page.addOrder(orderItem);
         }
@@ -49,6 +47,16 @@ public class DefaultSikaLedgerServiceImpl extends ServiceImpl<SikaLedgerMapper, 
                 .page(page);
 
         // 3. 封装VO
+        return page2PageVO(statusQuery, sikaLedgerPage);
+    }
+
+    /**
+     * 将 MP 的 Page 转为 PageVO, Page中没有数据则返回空集合
+     * @param statusQuery 查询参数
+     * @param sikaLedgerPage MP的查询结果Page对象
+     * @return PageVO
+     */
+    private static PageVO<SikaLedger> page2PageVO(StatusBaseQuery statusQuery, Page<SikaLedger> sikaLedgerPage) {
         PageVO<SikaLedger> sikaLedgerPageVO = new PageVO<>();
         sikaLedgerPageVO.setTotalCount(sikaLedgerPage.getTotal());
         sikaLedgerPageVO.setTotalPages(sikaLedgerPage.getPages());
@@ -57,16 +65,15 @@ public class DefaultSikaLedgerServiceImpl extends ServiceImpl<SikaLedgerMapper, 
         // 4. 返回
         List<SikaLedger> records = sikaLedgerPage.getRecords();
         // 没有数据则返回空集合
-        if (CollUtil.isEmpty(records)) {
-            sikaLedgerPageVO.setList(Collections.emptyList());
-        }
-        else {
-            sikaLedgerPageVO.setList(records);
-        }
+        sikaLedgerPageVO.setList(records);
         return sikaLedgerPageVO;
     }
 
-    private <T extends BaseQuery> void checkQuery(T query) {
+    /**
+     * 对必要的查询参数进行自动填充
+     * @param query 查询参数 BaseQuery 的子类
+     */
+    private <T extends BaseQuery> void fillQuery(T query) {
         /* 处理排序方式 */
         if (Objects.isNull(query.getIsDesc())) {
             query.setIsDesc(Boolean.FALSE);

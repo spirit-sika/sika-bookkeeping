@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cc.sika.bookkeeping.mapper.SikaLedgerMapper">
+    <insert id="insertLeger"
+            useGeneratedKeys="true"
+            keyProperty="ledgerId"
+            keyColumn="ledger_id"
+    >
+        INSERT INTO sika_ledger
+            (ledger_name, ledger_status, create_by, create_time, update_by, update_time)
+        VALUES
+            (#{ledgerName}, #{ledgerStatus}, #{createBy}, #{createTime}, #{updateBy}, #{updateTime})
+    </insert>
+</mapper>
