@@ -29,6 +29,14 @@ public class Result<T> implements Serializable {
         return success(200, message, data);
     }
 
+    /**
+     * 将data域内容填充为成功提示消息
+     * @param message 成功提示消息
+     */
+    public static Result<String> successMessage(String message) {
+        return success(message, null);
+    }
+
     /* ******************** 响应错误消息 ******************** */
     public static <T> Result<T> error(Integer code, String message, T data) {
         return new Result<T>(code, message, data);
