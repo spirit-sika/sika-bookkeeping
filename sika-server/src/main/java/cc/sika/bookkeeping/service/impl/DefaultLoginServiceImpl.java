@@ -1,12 +1,19 @@
 package cc.sika.bookkeeping.service.impl;
 
 import cc.sika.bookkeeping.constant.AuthenticationConstant;
+import cc.sika.bookkeeping.constant.AutoFillConstant;
+import cc.sika.bookkeeping.constant.LedgerConstant;
+import cc.sika.bookkeeping.exception.LedgerException;
 import cc.sika.bookkeeping.exception.LoginException;
 import cc.sika.bookkeeping.exception.RegisterException;
+import cc.sika.bookkeeping.mapper.SikaLedgerMapper;
+import cc.sika.bookkeeping.mapper.SikaLedgerUserMapper;
 import cc.sika.bookkeeping.mapper.SikaUserMapper;
 import cc.sika.bookkeeping.mapper.SikaUserRoleMapper;
 import cc.sika.bookkeeping.pojo.dto.LoginDTO;
 import cc.sika.bookkeeping.pojo.dto.RegisterDTO;
+import cc.sika.bookkeeping.pojo.po.SikaLedger;
+import cc.sika.bookkeeping.pojo.po.SikaLedgerUser;
 import cc.sika.bookkeeping.pojo.po.SikaUser;
 import cc.sika.bookkeeping.pojo.po.SikaUserRole;
 import cc.sika.bookkeeping.pojo.vo.LoginVO;
@@ -18,6 +25,7 @@ import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +35,14 @@ import java.util.Objects;
 
 @Service("loginService")
 @RequiredArgsConstructor
-public class DefaultLoginServiceImpl implements LoginService {
+public class DefaultLoginServiceImpl extends ServiceImpl<SikaUserMapper, SikaUser> implements LoginService  {
 
     private final CaptchaService captchaService;
     private final SikaUserService userService;
     private final SikaUserRoleMapper sikaUserRoleMapper;
     private final SikaUserMapper sikaUserMapper;
+    private final SikaLedgerMapper sikaLedgerMapper;
+    private final SikaLedgerUserMapper sikaLedgerUserMapper;
 
     @Override
     public String login(LoginDTO loginDTO) {
@@ -60,15 +70,60 @@ public class DefaultLoginServiceImpl implements LoginService {
     @Override
     @Transactional(rollbackFor = RegisterException.class)
     public String register(RegisterDTO registerDTO) {
-        LambdaQueryWrapper<SikaUser> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
         /* 检查是否存在相同手机号码 */
         SikaUser isUserExists = sikaUserMapper.selectOne(
-                userLambdaQueryWrapper.eq(SikaUser::getPhone, registerDTO.getPhone()),
+                lambdaQuery().eq(SikaUser::getPhone, registerDTO.getPhone()),
                 false);
         if (!Objects.isNull(isUserExists)) {
-            throw new RegisterException("手机号码已被注册!");
+            throw RegisterException.PHONE_EXITS();
         }
-        /* 构建用户实体 */
+
+
+        /* 插入用户数据 */
+        // 构建用户实体
+        SikaUser sikaUser = buildSikaUser(registerDTO);
+        int insertResult = sikaUserMapper.insertUser(sikaUser);
+        if (insertResult != 1) {
+            throw RegisterException.CREATE_ERROR();
+        }
+
+        // 绑定角色信息
+        SikaUserRole userRoleMapEntity = SikaUserRole.builder()
+                .userId(sikaUser.getUserId())
+                .roleId(AuthenticationConstant.USER_ROLE_ID)
+                .build();
+        int mapUserRoleResult = sikaUserRoleMapper.insert(userRoleMapEntity);
+        if (mapUserRoleResult != 1) {
+            throw RegisterException.FAIL_BIND_ROLE();
+        }
+
+        // 创建默认账本
+        SikaLedger sikaLedger = SikaLedger.builder()
+                .ledgerName(LedgerConstant.DEFAULT_LEDGER_NAME)
+                .ledgerStatus(AutoFillConstant.ENABLE_STATUS)
+                .build();
+        int legerInserted = sikaLedgerMapper.insertLeger(sikaLedger);
+        if (legerInserted != 1) {
+            throw LedgerException.CREATE_ERROR();
+        }
+        // 绑定账本
+        SikaLedgerUser ledgerUser = SikaLedgerUser.builder()
+                .userId(sikaUser.getUserId())
+                .ledgerId(sikaLedger.getLedgerId())
+                .build();
+        int bindingLedger = sikaLedgerUserMapper.insert(ledgerUser);
+        if (bindingLedger != 1) {
+            throw LedgerException.FAIL_BIND_USER();
+        }
+
+        return sikaUser.getNickname() + "用户注册成功";
+    }
+
+    /**
+     * 构建用户实体, 不合法数据使用默认值填充
+     * @param registerDTO registerDTO 用户表单信息实体
+     */
+    private static SikaUser buildSikaUser(RegisterDTO registerDTO) {
         SikaUser sikaUser = SikaUser.builder()
                 .phone(registerDTO.getPhone())
                 .username(registerDTO.getPhone())
@@ -94,22 +149,7 @@ public class DefaultLoginServiceImpl implements LoginService {
         else {
             sikaUser.setPassword(SaSecureUtil.sha256(registerDTO.getPhone()));
         }
-
-        /* 插入用户数据 */
-        int insertResult = sikaUserMapper.insertUser(sikaUser);
-        if (insertResult != 1) {
-            throw new RegisterException("注册用户失败, 请联系管理人员!");
-        }
-        /* 生成角色信息 */
-        SikaUserRole userRoleMapEntity = SikaUserRole.builder()
-                .userId(sikaUser.getUserId())
-                .roleId(AuthenticationConstant.USER_ROLE_ID)
-                .build();
-        int mapUserRoleResult = sikaUserRoleMapper.insert(userRoleMapEntity);
-        if (mapUserRoleResult != 1) {
-            throw new RegisterException("绑定用户角色失败, 请联系管理人员!");
-        }
-        return sikaUser.getNickname() + "用户注册成功";
+        return sikaUser;
     }
 
     /**
