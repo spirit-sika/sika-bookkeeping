@@ -1,11 +1,13 @@
 package cc.sika.bookkeeping.controller;
 
-import cc.sika.bookkeeping.pojo.dto.StatusBaseQuery;
+import cc.sika.bookkeeping.pojo.dto.BaseQuery;
+import cc.sika.bookkeeping.pojo.dto.LedgeQueryDTO;
 import cc.sika.bookkeeping.pojo.po.SikaLedger;
 import cc.sika.bookkeeping.pojo.vo.PageVO;
 import cc.sika.bookkeeping.pojo.vo.Result;
 import cc.sika.bookkeeping.service.SikaLedgerService;
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,8 +27,9 @@ public class LedgerController {
 
     @Operation(summary = "获取用户账本接口")
     @ApiResponse(content = @Content(schema = @Schema(implementation = SikaLedger.class)))
-    @GetMapping
-    public Result<PageVO<SikaLedger>> getUserLedger(StatusBaseQuery statusQuery) {
+    @GetMapping("list")
+    @SaCheckRole({"admin"})
+    public Result<PageVO<SikaLedger>> getUserLedger(BaseQuery<LedgeQueryDTO> statusQuery) {
         return Result.success(sikaLedgerService.getLedgersPage(statusQuery));
     }
 

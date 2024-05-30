@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cc.sika.bookkeeping.mapper.SikaRoleMapper">
+    <select id="getRolesByUserId" resultType="java.lang.String">
+        SELECT sr.role_name
+        FROM sika_role sr
+                 LEFT JOIN sika_user_role sur
+                           ON sr.role_id = sur.role_id
+        WHERE sur.user_id = #{userId};
+    </select>
+</mapper>

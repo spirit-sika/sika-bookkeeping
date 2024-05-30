@@ -9,5 +9,6 @@ import org.springframework.cache.annotation.EnableCaching;
 public class SikaBookkeepingApplication {
     public static void main(String[] args) {
         SpringApplication.run(SikaBookkeepingApplication.class, args);
+
     }
 }

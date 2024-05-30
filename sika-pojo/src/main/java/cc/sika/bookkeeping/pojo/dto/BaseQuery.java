@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BaseQuery implements Serializable {
+public class BaseQuery<T> implements Serializable {
     /**
      * 页数
      */
@@ -31,4 +31,8 @@ public class BaseQuery implements Serializable {
      * 是否降序排列, 默认升序
      */
     private Boolean isDesc;
+    /**
+     * 包含查询信息的查询实体信息
+     */
+    private T data;
 }

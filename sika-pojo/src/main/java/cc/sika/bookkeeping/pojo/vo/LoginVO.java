@@ -32,6 +32,8 @@ public class LoginVO implements Serializable {
     private Byte sex;
     /** 头像url */
     private String avatar;
+    /** 角色名称 */
+    private String role;
     /** token */
     private String token;
 }

@@ -81,8 +81,9 @@ sika:
     level:
       cc:
         sika:
-          sikaloginserver:
+          bookkeeping:
             mapper: debug
+            controller: info
       root: warn
       org:
         springframework: info

@@ -1,5 +1,6 @@
 package cc.sika.bookkeeping.pojo.po;
 
+import cc.sika.bookkeeping.StatusEnum;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -30,7 +31,7 @@ public class SikaLedger implements Serializable {
     /**
      * 账本状态, 0启用, 1冻结(删除)
      */
-    private Byte ledgerStatus;
+    private StatusEnum ledgerStatus;
 
     /**
      * 账本创建人

@@ -15,3 +15,4 @@
 - 接入Oauth2
 - 登录接口错误次数限制
 - 首页账单明细查询
+- 扩展抽象类 AbstractSqlInjector, 剔除日志警告删除 xxxById() 扩展, 使用AOP删除指定PO

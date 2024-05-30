@@ -13,4 +13,11 @@
             (#{username}, #{password}, #{phone}, #{email}, #{sex}, #{avatar}, #{nickname},
              #{createTime}, #{createBy}, #{updateTime}, #{updateBy}, #{remark})
     </insert>
+    <select id="selectRoleNameByUserId" resultType="java.lang.String">
+        SELECT `role_name`
+        FROM `sika_role` r
+            LEFT JOIN `sika_user_role` ur
+            ON ur.role_id = r.role_id
+        WHERE ur.user_id = #{userId};
+    </select>
 </mapper>

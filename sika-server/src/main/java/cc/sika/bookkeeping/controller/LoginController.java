@@ -15,12 +15,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequestMapping("user")
 @AllArgsConstructor
+@Slf4j
 public class LoginController {
 
     private final CaptchaService captchaService;
@@ -58,6 +60,6 @@ public class LoginController {
     @SaCheckLogin
     public Result<String> logout() {
         StpUtil.logout();
-        return Result.success("退出登录成功!");
+        return Result.successMessage("退出登录成功!");
     }
 }

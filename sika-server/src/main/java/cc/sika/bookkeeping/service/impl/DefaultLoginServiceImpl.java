@@ -1,7 +1,7 @@
 package cc.sika.bookkeeping.service.impl;
 
+import cc.sika.bookkeeping.StatusEnum;
 import cc.sika.bookkeeping.constant.AuthenticationConstant;
-import cc.sika.bookkeeping.constant.AutoFillConstant;
 import cc.sika.bookkeeping.constant.LedgerConstant;
 import cc.sika.bookkeeping.exception.LedgerException;
 import cc.sika.bookkeeping.exception.LoginException;
@@ -64,6 +64,8 @@ public class DefaultLoginServiceImpl extends ServiceImpl<SikaUserMapper, SikaUse
         );
         LoginVO loginVO = BeanUtil.copyProperties(user, LoginVO.class);
         loginVO.setToken(StpUtil.getTokenValue());
+        String roleName = sikaUserMapper.selectRoleNameByUserId(user.getUserId());
+        loginVO.setRole(roleName);
         return loginVO;
     }
 
@@ -100,7 +102,7 @@ public class DefaultLoginServiceImpl extends ServiceImpl<SikaUserMapper, SikaUse
         // 创建默认账本
         SikaLedger sikaLedger = SikaLedger.builder()
                 .ledgerName(LedgerConstant.DEFAULT_LEDGER_NAME)
-                .ledgerStatus(AutoFillConstant.ENABLE_STATUS)
+                .ledgerStatus(StatusEnum.ENABLE)
                 .build();
         int legerInserted = sikaLedgerMapper.insertLeger(sikaLedger);
         if (legerInserted != 1) {
@@ -171,9 +173,9 @@ public class DefaultLoginServiceImpl extends ServiceImpl<SikaUserMapper, SikaUse
 
         // 校验不通过
         if (Objects.isNull(loginUser)) {
-            SikaUser phoneExists = userService.getOne(new LambdaQueryWrapper<>(SikaUser.class)
-                    .eq(StringUtils.hasText(phone), SikaUser::getPhone, phone));
-            if (!Objects.isNull(phoneExists)) {
+            SikaUser phoneExists = userService
+                    .getOne(lambdaQuery().getWrapper().eq(StringUtils.hasText(phone), SikaUser::getPhone, phone));
+            if (Objects.isNull(phoneExists)) {
                 throw new LoginException("该手机号码未注册!");
             }
             throw new LoginException("手机或密码错误!");

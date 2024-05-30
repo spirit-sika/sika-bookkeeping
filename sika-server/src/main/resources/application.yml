@@ -77,8 +77,9 @@ logging:
   level:
     cc:
       sika:
-        sikaloginserver:
-          mapper: ${sika.logging.level.cc.sika.sikaloginserver.mapper}
+        bookkeeping:
+          mapper: ${sika.logging.level.cc.sika.bookkeeping.mapper}
+          controller: ${sika.logging.level.cc.sika.bookkeeping.controller}
     root: ${sika.logging.level.root}
     org:
       springframework: ${sika.logging.level.org.springframework}
